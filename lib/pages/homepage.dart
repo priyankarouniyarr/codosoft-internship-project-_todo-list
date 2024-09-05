@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:todo_list/data/todo.dart';
+import 'package:todo_list/pages/viewingpage.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -12,81 +15,109 @@ class _HomepageState extends State<Homepage> {
   List<Todo> todos = [
     Todo(id: 1, title: "Buy Milk", description: "completed", status: false),
     Todo(id: 2, title: "Buy biscuit", description: "completed", status: false),
-
-
+    Todo(id: 3, title: "Buy chocolate", description: "completed", status: false),
   ];
 
-
-  delete(Todo todo){
-    return showDialog(context: 
-  context, builder: (context)=>AlertDialog(
-    title: Text("Delete Todo"),
-    content: Text("Are you sure you want to delete this todo"),
-    actions: [
-      TextButton(onPressed: () {
-        setState(() {
-          todos.remove(todo);//remove and  elements from the list
-          }
-          
-          );
-          Navigator.pop(context);
-          }, child: Text("Yes")),
-
-         
-          TextButton(onPressed: () {
-            Navigator.pop(context);
-            }, child: Text("No")),
-    ],
-  ));
+  // Delete function
+  void delete(Todo todo) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Todo"),
+        content: const Text("Are you sure you want to delete this todo?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                todos.remove(todo); // Remove item from the list
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("No"),
+          ),
+        ],
+      ),
+    );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
-            'Todo',
-            style: TextStyle(color: const Color.fromARGB(255, 15, 207, 191)),
-          ),
-          centerTitle: true,
-          backgroundColor: const Color.fromARGB(255, 39, 57, 160),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'Todo',
+          style: TextStyle(color: Color.fromARGB(255, 15, 207, 191)),
         ),
-        body: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: todos.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                elevation: 3.0,
-                margin: EdgeInsetsDirectional.symmetric(
-                    horizontal: 10.0, vertical: 6.0),
-                child: GestureDetector(
-                    onTap: () {}, child: makelist(todos[index], index)),
-              );
-            }));
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 39, 57, 160),
+      ),
+      body: ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: todos.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            elevation: 3.0,
+            margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            child: makelist(todos[index], index),
+          );
+        },
+      ),
+      floatingActionButton: 
+      FloatingActionButton(
+        child:Icon(Icons.add,size:20,color: Colors.white,),
+        onPressed: (){
+          addtodo();
+        
+      },backgroundColor:Colors.blue ,
+      ),
+    );
   }
+addtodo() async{
+  int id=Random().nextInt(30);
+  Todo tod =Todo(id: id, title: '', description: '', status: false);
+  Todo returnTodo= await(
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TodoView(todo: tod)),
+      
+  ));
+  if(returnTodo!=null){
+    setState(() {
+      todos.add(returnTodo);
+      });
+      }
 
-  makelist(Todo todo, index) {
+
+}
+  Widget makelist(Todo todo, int index) {
     return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
-          padding: EdgeInsets.only(right: 8.0),
-          decoration: BoxDecoration(
-              border: Border(right: BorderSide(width: 1.0, color: Colors.red))),
-          child: CircleAvatar(
-            backgroundColor: Colors.blue,
-            child: Text("${index + 1}"), // list of todo
-          )),
+        padding: const EdgeInsets.only(right: 8.0),
+        decoration: const BoxDecoration(
+          border: Border(right: BorderSide(width: 1.0, color: Colors.red)),
+        ),
+        child: CircleAvatar(
+          backgroundColor: Colors.blue,
+          child: Text("${index + 1}"), // List of todo
+        ),
+      ),
       title: Row(
         children: [
           Text(
             todo.title,
-            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
-            width: 10.0,
-          ),
+          const SizedBox(width: 10.0),
           todo.status
-              ? Icon(Icons.verified, color: Colors.greenAccent)
+              ? const Icon(Icons.verified, color: Colors.greenAccent)
               : Container(),
         ],
       ),
@@ -96,25 +127,34 @@ class _HomepageState extends State<Homepage> {
             todo.description,
             overflow: TextOverflow.clip,
             maxLines: 2,
-            style: TextStyle(fontSize: 14.0),
+            style: const TextStyle(fontSize: 14.0),
           ),
         ],
       ),
-       trailing: Row(
-        mainAxisSize: MainAxisSize.min, 
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
-            onTap: () {
-              // EDIT TODO
+            onTap: () async {
+              Todo? updatedTodo = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TodoView(todo: todo)),
+              );
+              if (updatedTodo != null) {
+                setState(() {
+                  int index = todos.indexOf(todo);
+                  todos[index] = updatedTodo;
+                });
+              }
             },
-            child: Icon(Icons.edit, color: Colors.black, size: 30.0),
+            child: const Icon(Icons.edit, color: Colors.black, size: 30.0),
           ),
-          SizedBox(width: 10.0),
+          const SizedBox(width: 10.0),
           GestureDetector(
             onTap: () {
               delete(todo);
             },
-            child: Icon(Icons.delete, color: Colors.black, size: 30.0),
+            child: const Icon(Icons.delete, color: Colors.black, size: 30.0),
           ),
         ],
       ),
