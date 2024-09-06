@@ -1,32 +1,31 @@
-class Todo{
+class Todo {
   int id;
   String title;
   String description;
   bool status;
-Todo({
-  required this.id,
-  required this. title,
-  required this .description,
-  required this.status,
-}) ;
-// The toJson method converts the Todo object into a format (a map) that can be easily saved or shared as JSON.
-toJson(){
-  return {
-    'id': id,
-    'title':title,
-    'description':description,
-    'status':status,
 
-  };
+  Todo({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.status,
+  });
 
-}
-//The fromJson method takes a map (that looks like JSON) and turns it back into a Todo object, so you can work with it in your app.
-fromJson(JsonData){
-  return Todo(
-  id : JsonData['id'],
-  title : JsonData['title'],
-  description:JsonData['description'],
-  status:JsonData['status'],);
+  // Convert a Todo object into a Map
+ Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'description': description,
+        'status': status,
+      };
+
+  // Create a Todo object from a Map
+factory Todo .fromJson(Map<String, dynamic> json) {
+    return Todo(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      status: json['status'],
+    );
   }
 }
-

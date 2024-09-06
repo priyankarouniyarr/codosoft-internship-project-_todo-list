@@ -1,10 +1,12 @@
+import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list/data/todo.dart';
 import 'package:todo_list/pages/viewingpage.dart';
 
 class Homepage extends StatefulWidget {
+  
   const Homepage({super.key});
 
   @override
@@ -12,13 +14,53 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  SharedPreferences? prefs;
   List<Todo> todos = [
-    Todo(id: 1, title: "Buy Milk", description: "completed", status: false),
-    Todo(id: 2, title: "Buy biscuit", description: "completed", status: false),
-    Todo(id: 3, title: "Buy chocolate", description: "completed", status: false),
+   
   ];
 
-  // Delete function
+  @override
+  void initState() {
+    super.initState();
+    loadTodos(); // Loading todos from SharedPreferences when the app starts
+  }
+
+  // Load todos from SharedPreferences
+  Future<void> loadTodos() async {
+    prefs = await SharedPreferences.getInstance();
+    String? storedTodos = prefs?.getString('todos');
+    if (storedTodos != null) {
+      List<dynamic> decodedTodos = jsonDecode(storedTodos);
+      setState(() {
+        todos = decodedTodos.map((item) => Todo.fromJson(item)).toList();
+      });
+    }
+  }
+
+  // Save todos to SharedPreferences
+  void saveTodos() {
+    List<Map<String, dynamic>> todoList = todos.map((e) => e.toJson()).toList();
+    prefs?.setString('todos', jsonEncode(todoList));
+  }
+
+  // Add todo
+  Future<void> addTodo() async {
+    int id = Random().nextInt(30);
+    Todo newTodo = Todo(id: id, title: '', description: '', status: false);
+    Todo? returnTodo = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TodoView(todo: newTodo)),
+    );
+
+    if (returnTodo != null) {
+      setState(() {
+        todos.add(returnTodo);
+      });
+      saveTodos();
+    }
+  }
+
+  // Delete todo
   void delete(Todo todo) {
     showDialog(
       context: context,
@@ -29,7 +71,8 @@ class _HomepageState extends State<Homepage> {
           TextButton(
             onPressed: () {
               setState(() {
-                todos.remove(todo); // Remove item from the list
+                todos.remove(todo);
+                saveTodos(); // Update SharedPreferences after deleting
               });
               Navigator.pop(context);
             },
@@ -59,44 +102,25 @@ class _HomepageState extends State<Homepage> {
         backgroundColor: const Color.fromARGB(255, 39, 57, 160),
       ),
       body: ListView.builder(
-        scrollDirection: Axis.vertical,
+  
         itemCount: todos.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
             elevation: 3.0,
             margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-            child: makelist(todos[index], index),
+            child: buildListTile(todos[index], index),
           );
         },
       ),
-      floatingActionButton: 
-      FloatingActionButton(
-        child:Icon(Icons.add,size:20,color: Colors.white,),
-        onPressed: (){
-          addtodo();
-        
-      },backgroundColor:Colors.blue ,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add, size: 20, color: Colors.white),
+        onPressed: addTodo,
+        backgroundColor: Colors.blue,
       ),
     );
   }
-addtodo() async{
-  int id=Random().nextInt(30);
-  Todo tod =Todo(id: id, title: '', description: '', status: false);
-  Todo returnTodo= await(
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => TodoView(todo: tod)),
-      
-  ));
-  if(returnTodo!=null){
-    setState(() {
-      todos.add(returnTodo);
-      });
-      }
 
-
-}
-  Widget makelist(Todo todo, int index) {
+  Widget buildListTile(Todo todo, int index) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
@@ -116,9 +140,7 @@ addtodo() async{
             style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 10.0),
-          todo.status
-              ? const Icon(Icons.verified, color: Colors.greenAccent)
-              : Container(),
+          todo.status ? const Icon(Icons.verified, color: Colors.greenAccent) : Container(),
         ],
       ),
       subtitle: Wrap(
@@ -145,6 +167,7 @@ addtodo() async{
                   int index = todos.indexOf(todo);
                   todos[index] = updatedTodo;
                 });
+                saveTodos(); // Save updated todo
               }
             },
             child: const Icon(Icons.edit, color: Colors.black, size: 30.0),
@@ -161,3 +184,4 @@ addtodo() async{
     );
   }
 }
+ 
