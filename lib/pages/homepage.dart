@@ -6,7 +6,6 @@ import 'package:todo_list/data/todo.dart';
 import 'package:todo_list/pages/viewingpage.dart';
 
 class Homepage extends StatefulWidget {
-  
   const Homepage({super.key});
 
   @override
@@ -15,9 +14,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   SharedPreferences? prefs;
-  List<Todo> todos = [
-   
-  ];
+  List<Todo> todos = [];
 
   @override
   void initState() {
@@ -96,13 +93,13 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: const Text(
           'Todo',
-          style: TextStyle(color: Color.fromARGB(255, 15, 207, 191)),
+          style: TextStyle(color: Color.fromARGB(255, 18, 15, 207)),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 39, 57, 160),
+        backgroundColor:  Colors.amber[500]!.withOpacity(0.8)
       ),
       body: ListView.builder(
-  
+       
         itemCount: todos.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
@@ -115,14 +112,15 @@ class _HomepageState extends State<Homepage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add, size: 20, color: Colors.white),
         onPressed: addTodo,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.amber[500],
       ),
     );
   }
 
   Widget buildListTile(Todo todo, int index) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
         padding: const EdgeInsets.only(right: 8.0),
         decoration: const BoxDecoration(
@@ -140,7 +138,9 @@ class _HomepageState extends State<Homepage> {
             style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 10.0),
-          todo.status ? const Icon(Icons.verified, color: Colors.greenAccent) : Container(),
+          todo.status
+              ? const Icon(Icons.verified, color: Colors.greenAccent)
+              : Container(),
         ],
       ),
       subtitle: Wrap(
@@ -167,7 +167,8 @@ class _HomepageState extends State<Homepage> {
                   int index = todos.indexOf(todo);
                   todos[index] = updatedTodo;
                 });
-                saveTodos(); // Save updated todo
+                saveTodos();
+
               }
             },
             child: const Icon(Icons.edit, color: Colors.black, size: 30.0),
@@ -184,4 +185,3 @@ class _HomepageState extends State<Homepage> {
     );
   }
 }
- 

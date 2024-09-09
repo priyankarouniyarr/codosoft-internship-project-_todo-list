@@ -56,11 +56,11 @@ class _TodoViewState extends State<TodoView> {
       appBar: AppBar(
         title: const Text(
           'Todo View',
-          style: TextStyle(color: Color.fromARGB(255, 15, 207, 191)),
+          style: TextStyle(color: Color.fromARGB(255, 18, 15, 207)),
         ),
         elevation: 10,
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 39, 57, 160),
+        backgroundColor: Colors.amber[600]!.withOpacity(0.8),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -101,7 +101,7 @@ class _TodoViewState extends State<TodoView> {
                     onTap: _toggleTodoStatus,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: Colors.amber[600]!.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(25),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
