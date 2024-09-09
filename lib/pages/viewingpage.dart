@@ -38,11 +38,23 @@ class _TodoViewState extends State<TodoView> {
   }
 
   void _saveChanges() {
-    setState(() {
-      widget.todo.title = titleController.text;
-      widget.todo.description = descriptionEditingController.text;
-    });
-    Navigator.pop(context, widget.todo);
+    // Check if both fields are filled
+    if (titleController.text.isEmpty || descriptionEditingController.text.isEmpty) {
+      // Show a SnackBar if fields are empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('All fields should be filled'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      // Save changes if all fields are filled
+      setState(() {
+        widget.todo.title = titleController.text;
+        widget.todo.description = descriptionEditingController.text;
+      });
+      Navigator.pop(context, widget.todo);
+    }
   }
 
   void _cancelChanges() {
@@ -113,7 +125,7 @@ class _TodoViewState extends State<TodoView> {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            widget.todo.status ?'Task Done' : 'Task Not Done',
+                            widget.todo.status ? 'Task Done' : 'Task Not Done',
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
